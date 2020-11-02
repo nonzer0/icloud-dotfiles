@@ -22,7 +22,7 @@ $ git clone --recursive https://github.com/searls/icloud-dotfiles.git "~/Library
 ### 2. Run the setup script
 
 Now, run the initial setup script (which you can review
-[here](https://github.com/searls/icloud-dotfiles/blob/master/bin/setup-new-mac)):
+[here](https://github.com/nonzer0/icloud-dotfiles/blob/master/bin/setup-new-mac)):
 
 ```
 $ ~/Library/Mobile\ Documents/com~apple~CloudDocs/dotfiles/bin/setup-new-mac
