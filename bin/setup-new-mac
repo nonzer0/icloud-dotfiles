@@ -5,9 +5,9 @@ set -e
 # Create symlinks from iCloud to home directory
 cd "$HOME"
 [ ! -L icloud-drive ] && ln -s "$HOME/Library/Mobile Documents/com~apple~CloudDocs" icloud-drive
-[ ! -L lolbrary ] && ln -s "$HOME/Library" lolbrary
+# [ ! -L lolbrary ] && ln -s "$HOME/Library" lolbrary
 
-for link in .gemrc .pryrc .gitconfig .gitignore_global .homebridge .inputrc .profile .bashrc .vim .vimrc bin .vscode .zprofile .zshenv .zshrc .fzf.zsh .fzf.bash .tmux.conf; do
+for link in .gitconfig .inputrc .bashrc .vim .vimrc .vscode .zshrc .fzf.zsh .fzf.bash .tmux.conf; do
   if [ -L "$HOME/$link" ]; then
     echo "Link '$link' already exists"
   else
@@ -16,7 +16,7 @@ for link in .gemrc .pryrc .gitconfig .gitignore_global .homebridge .inputrc .pro
 done
 
 # Shush MOTD
-touch "$HOME/.hushlogin"
+# touch "$HOME/.hushlogin"
 
 ## link .ssh config
 mkdir -p "$HOME/.ssh"
@@ -24,13 +24,39 @@ cd "$HOME/.ssh"
 [ ! -L config ] && ln -s ../icloud-drive/dotfiles/.ssh/config .
 cd ..
 
+### link  neovim configs
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.config/nvim"
+cd "$HOME/.config/nvim"
+for link in init.vim; do
+  if [ -L "$HOME/.config/nvim/$link" ]; then
+    echo "Link '$link' already exists"
+  else
+    ln -s ../icloud-drive/dotfiles/.config/nvim/init.vim .
+  fi
+done
+cd ../../
+
+### link  bat configs
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.config/bat"
+cd "$HOME/.config/bat"
+for link in bat.conf config; do
+  if [ -L "$HOME/.config/bat/$link" ]; then
+    echo "Link '$link' already exists"
+  else
+    ln -s ../icloud-drive/dotfiles/.config/bat/$link .
+  fi
+done
+cd ../../
+
 # Set macOS default hidden settings
 
 ## Disabling shadows on windows when taking screenshots - requires killall SystemUIServer
-defaults write com.apple.screencapture disable-shadow -bool true
+# defaults write com.apple.screencapture disable-shadow -bool true
 ## allow disabling inline video in safari http://www.kirkville.com/stop-auto-play-videos-from-annoying-you-in-your-browser/
-defaults write com.apple.Safari WebKitMediaPlaybackAllowsInline -bool false
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback -bool false
+# defaults write com.apple.Safari WebKitMediaPlaybackAllowsInline -bool false
+# defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback -bool false
 
 # Install things
 if command -v brew; then
@@ -43,7 +69,7 @@ fi
 # Brew installations
 brew tap heroku/brew
 brew tap universal-ctags/universal-ctags
-for pkg in vim bash bash-completion git git-lfs nodenv node-build rbenv ruby-build postgresql wget tree jid jq netlify-cli heroku hugo yarn fzf ripgrep; do
+for pkg in vim bash bash-completion git git-lfs nodenv node-build rbenv ruby-build postgresql wget tree jq yarn fzf ripgrep; do
   if brew list -1 | grep -q "^${pkg}\$"; then
     echo "Package '$pkg' is installed; updating:"
     brew upgrade "$pkg" && brew cleanup "$pkg" || true
@@ -52,24 +78,19 @@ for pkg in vim bash bash-completion git git-lfs nodenv node-build rbenv ruby-bui
   fi
 done
 
-# Disable netlify tracking
-netlify --telemetry-disable
-netlify plugins:install netlify-lm-plugin
-netlify lm:install
-
 # Start postgres
-brew services start postgres
+# brew services start postgres
 
-if brew list -1 | grep -q "^universal-ctags\$"; then
-  echo "Package 'universal-ctags' is installed; updating:"
-  brew upgrade bash-completion --cleanup || true
-else
-  brew install --HEAD universal-ctags
-fi
+# if brew list -1 | grep -q "^universal-ctags\$"; then
+  # echo "Package 'universal-ctags' is installed; updating:"
+  # brew upgrade bash-completion --cleanup || true
+# else
+  # brew install --HEAD universal-ctags
+# fi
 
 # Switch to brew bash
-echo /usr/local/bin/bash | sudo tee -a /etc/shells
-chsh -s /usr/local/bin/bash
+# echo /usr/local/bin/bash | sudo tee -a /etc/shells
+# chsh -s /usr/local/bin/bash
 
 ## Set shell to zsh
 
@@ -87,16 +108,16 @@ eval "$(nodenv init -)"
 nodenv global "$NODE_VERSION"
 
 ## Set up ruby
-RUBY_VERSION="2.7.1"
-if [ -d ".rbenv/versions/$RUBY_VERSION" ]; then
-  echo "Ruby $RUBY_VERSION already installed"
-else
-  rbenv install "$RUBY_VERSION"
-fi
-eval "$(rbenv init -)"
-rbenv global "$RUBY_VERSION"
-gem install bundler
+# RUBY_VERSION="2.7.1"
+# if [ -d ".rbenv/versions/$RUBY_VERSION" ]; then
+  # echo "Ruby $RUBY_VERSION already installed"
+# else
+  # rbenv install "$RUBY_VERSION"
+# fi
+# eval "$(rbenv init -)"
+# rbenv global "$RUBY_VERSION"
+# gem install bundler
 
 # Run profile
-source .profile
+# source .profile
 
